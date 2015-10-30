@@ -4,7 +4,7 @@ define(['app/layouts', 'app/mixin/eventmanager'], function (appLayouts, appMixin
 		this._$root = $root;
 		this._options = options || {};
 		this._parent = parentPanel;
-
+		this._isHidden = false;
 		this._loaded = false;
 
 		appMixinEventManager.call(this);
@@ -56,8 +56,8 @@ define(['app/layouts', 'app/mixin/eventmanager'], function (appLayouts, appMixin
 		var options = this._options;
 		var layoutClass = appLayouts[options.Layout];
 		this._layout = new layoutClass(this._$root, options.LayoutOptions);
-
 		this._layout.wrap();
+
 	};
 
 	app.Panel.prototype._prepare = function () {
@@ -67,7 +67,21 @@ define(['app/layouts', 'app/mixin/eventmanager'], function (appLayouts, appMixin
 	app.Panel.prototype.$ = function (selector) {
 		return this.getContainer().find(selector);
 	};
+	
+	app.Panel.prototype.hide = function() {
+	    this.getContainer().hide();
+	    this._isHidden = true;
+	};
+	
+	app.Panel.prototype.show = function() {
+	    this.getContainer().show();
+	    this._isHidden = false;
+	};
 
+	app.Panel.prototype.hidden = function() {
+	    return this._isHidden;
+	}
+	
 	return app.Panel;
 
 });

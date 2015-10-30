@@ -14,6 +14,8 @@ define(function () {
 	app.components = null;
 	app.event = null;
 	app.loader = null;
+	app.PresentationDisplayPanel = null;
+	app.panels = [];
 
 	app.init = function () {
 		delete app.init; // dereference to prevent re-init
@@ -28,9 +30,21 @@ define(function () {
 	app.loadPanel = function (name, $container, parent, options) {
 		return requireOneDeferred(name)
 			.then(function (panelClass) {
-				return new panelClass($container, options || {}, parent);
+				var panel = new panelClass($container, options || {}, parent);
+				app.panels.push(panel); //Keep a reference of all loaded panels
+				return panel;
 			});
 	};
+	
+	
+	//TODO: Implement. Need to remove:
+	//DOM elements
+	//Event functions
+	//Other references to the panel	
+	app.removePanel = function (panel) {
+	    throw new Error('Tried to remove ' + panel + ' but this feature is not yet implemented');
+	}
+	
 
 	var setup = {
 		init: function () {
@@ -95,14 +109,14 @@ define(function () {
 	
 	app.promptPanel = function (parent, options) {	
 		var deferred = Q.defer();
-		options["Promise"] = options["Promise"] || deferred;
+		options.Promise = options.Promise || deferred;
 		app.loadPanel('app/panels/BasicInputDialog', $('#Content'), parent, options)
 		.then(function (panel) {
 			panel.deferredPromise = deferred;
 			panel.run();
 			//deferred.resolve("");
 		}).done();
-		return deferred.promise;
+		return options.Promise.promise;
 	};
 
 	return app;

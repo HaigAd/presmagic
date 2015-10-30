@@ -1,0 +1,59 @@
+.MediaListPanel {
+	max-width: 85%;
+	min-width:85%
+}
+
+#media-list-filter {
+	max-width: 60%;
+	
+	outline: none;
+	border:none;
+	height:20px;
+	padding: 1px;
+	margin: 5px 5px 5px 5px;
+	font-family: 'Segoe UI';
+	font-size: 14px;
+	font-weight: 400;
+}
+
+.MediaList {
+    max-height: 170px;
+    display:inline-block;
+    overflow-x:hidden;
+    overflow-y:scroll;
+    padding: 0px;
+    margin: 0px;
+	
+}
+
+.MediaList li {
+    display:inline-block;
+    background-color:black;
+    height: 130px;
+    width: 160px;    
+    overflow:hidden;
+}
+
+.MediaList li:hover {
+    background-color: darkgray;
+}
+
+.MediaList li span {
+    color:white;
+    font-family: 'Segoe UI';
+	font-size: 12px;
+	font-weight: 500;
+    padding: 0px 0px 0px 10px;
+    max-height: 0px;
+    overflow:hide;
+}
+
+.MediaList li img {
+    height: 100px;
+    width:150px;
+    padding: 5px 5px 0px 5px;
+}
+
+.MediaList li.Hidden {
+	display:none;
+}

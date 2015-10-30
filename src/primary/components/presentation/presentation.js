@@ -19,7 +19,7 @@ define(function () {
 		app.event.bind(app.EVENT_ROOTPANEL_LOADED, function (data) {
 			app.loadPanel('components/presentation/presentationpanel', $('#Content'), data.Panel)
 				.then(function (panel) {
-					panel.run();
+					panel.run();					
 				});
 		});
 	};

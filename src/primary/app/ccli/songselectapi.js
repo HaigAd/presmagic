@@ -10,11 +10,12 @@ define(['app/ccli/ccliconverter'], function (CCLISong) {
 
 	const SONG_SELECT_DOMAIN = "https://au.songselect.com/";
 	
+	var SongSelect = function(){};
 	/*
 	 * Returns a promise object which resolves when logged in successfully, or rejects when there is any failure to log in
 	 * Resolve will pass the parameter 'OrganizationName' through
 	 */
-	songSelectLogin = function (username, password) {
+	SongSelect.login = function (username, password) {
 		
 		return new Promise(function(resolve, reject) {
 			var xhr = new XMLHttpRequest();
@@ -55,7 +56,7 @@ define(['app/ccli/ccliconverter'], function (CCLISong) {
 		});
 	};
 	
-	songSelectLogout = function() {
+	SongSelect.logout = function() {
 		return new Promise(function(resolve, reject) {
 			var xhr = new XMLHttpRequest();
 			xhr.onload = function() {
@@ -79,13 +80,13 @@ define(['app/ccli/ccliconverter'], function (CCLISong) {
 	 * 
 	 * Note, will return a promise - if resolved, the promise passed through an array containing the results
 	 */
-	songSelectSearch = function(searchTerm, pageNumber) {
+	SongSelect.search = function(searchTerm, pageNumber) {
 		return new Promise(function (resolve, reject) {
 			var request = new XMLHttpRequest();
 			request.onload = function() {
 				if(request.readyState == 4 && request.status == 200) {
 					var $HTMLResults = $(request.responseText);
-					if(!loggedIn($HTMLResults)) {
+					if(!SongSelect.loggedIn($HTMLResults)) {
 						reject("loggedout");
 						return;
 					}
@@ -129,7 +130,7 @@ define(['app/ccli/ccliconverter'], function (CCLISong) {
 	/**
 	 * Pass this function a page from songselect, returns true if logged in, false if not
 	 */
-	loggedIn = function($page) {
+	SongSelect.loggedIn = function($page) {
 		return $page.find(".organization").length > 0;
 		
 	};
@@ -169,7 +170,7 @@ define(['app/ccli/ccliconverter'], function (CCLISong) {
 		xhr.open('GET', path, true);
 		xhr.onload = function() {
 		    if (this.status == 200) {
-			resolve(CCLISong.prototype.getCCLISong(xhr.responseText));			 
+			resolve(CCLISong.getCCLISong(xhr.responseText));			 
 		    } else {
 			reject(Error("connection"));
 		    }
@@ -189,7 +190,7 @@ define(['app/ccli/ccliconverter'], function (CCLISong) {
 			xhr.onload = function() {
 			  if (this.status == 200) {
 				  $response = $(xhr.responseText);
-				  if(loggedIn($response)) {
+				  if(SongSelect.loggedIn($response)) {
 					  $lyrics = $response.find('.lyrics');
 					  resolve($lyrics);
 				  } else {
@@ -207,4 +208,5 @@ define(['app/ccli/ccliconverter'], function (CCLISong) {
 		});
 	};
 	
+	return SongSelect;
 });

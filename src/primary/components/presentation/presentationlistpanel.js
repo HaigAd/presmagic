@@ -1,8 +1,10 @@
 define(['app/tool/actionset', 
         'text!components/presentation/presentation.html',
-        'app/panels/ListPanel', 'app/listable/songlistitem'],
+        'app/panels/ListPanel', 'app/listable/songlistitem',
+        'components/presentation/multimedia/medialoader',
+        'components/presentation/presentationframespanel'],
         
-        function (ActionSet, templateHTML, ListPanel, SongListItem) {
+        function (ActionSet, templateHTML, ListPanel, SongListItem, MediaLoader, FramesPanel) {
     
     	"use strict";
 
@@ -41,6 +43,7 @@ define(['app/tool/actionset',
 	    this._createActionSet();
 	    this.$('.List').on('click', 'li', this._listItemClicked.bind(this));
 	    this.$('.List').on('click', 'li .Action', this._listActionIconClicked.bind(this));
+	    app.event.bind(app.EVENT_PRESENTATION_CHANGED, this._openFramesDisplay.bind(this));
 		
 	    this._loadListFromDatabase();
 	};
@@ -107,6 +110,10 @@ define(['app/tool/actionset',
 				break;					
 		}
 	};
+	
+	
+	
+
 	
 	c.prototype._loadListFromDatabase = function() {
 	    var self = this;
@@ -188,7 +195,6 @@ define(['app/tool/actionset',
 		    $this.off(); //remove this event handler
 		    if(newtext.length === 0) return; //We don't want to have no name 
 		    //Database transaction
-		    //Would love some functions for the database so I can just do app.db.updateTitle(SONGID, TITLE)
 		    app.db.transaction('rw', [app.db.presentation], function () {
 			app.db.presentation.where('ID').equals(itemID).modify({"Name" : newtext});
 		    }).then(function() {
@@ -218,9 +224,16 @@ define(['app/tool/actionset',
 	 * Should be called when a song is imported
 	 * Updates the presentation list and local data structure
 	 */
-	c.prototype.onImport = function(item) {
-	    	    
+	c.prototype.onImport = function(item) {	    	    
 	    this._addItem(new SongListItem(item.Name, item.ID));
+	};
+	
+
+	c.prototype._openFramesDisplay = function(data) {	    
+	    app.PresentationDisplayPanel.setMainPanel('components/presentation/presentationframespanel', 
+		    {
+			PresentationID: data.PresentationID
+		    });
 	};
 
 	return c;

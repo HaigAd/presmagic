@@ -13,18 +13,23 @@ define(['style!components/presentation/presentation'], function () {
 
 	c.prototype = new parentClass();
 
+	var splitViewFrames;
+	
 	c.prototype._prepare = function () {
 		parent._prepare.call(this);
-
+		app.PresentationPanel = this;
 		var splitView = new app.SplitView.Vertical(this, 300, 'Fixed');
-		splitView.loadPanelOne('components/presentation/presentationlistpanel');
-		splitView.loadPanelTwo('components/presentation/presentationframespanel');
-
-//		var splitViewFrames = splitView.splitHorizontalTwo(30, 'Percent', false, 'Two');
-//		splitViewFrames.loadPanelOne('components/presentation/presentationframespanel');
-//		splitViewFrames.loadPanelTwo('components/presentation/presentationtimelinepanel');
+		splitView.loadPanelOne('components/presentation/presentationlistpanel', {});
+		console.log('loaded list');
+		//splitView.loadPanelTwo('app/panel', {});
+		console.log('loaded panel');
+		splitViewFrames = splitView.splitHorizontalTwo(30, 'Percent', false, 'Two');
+		console.log('split');
+		splitViewFrames.loadPanelTwo('components/presentation/multimedia/mediapanel', {});
+		console.log('loaded media');
+		splitViewFrames.loadPanelOne('components/presentation/presentationdisplaypanel');
 
 	};
-
+	
 	return c;
 });

@@ -74,6 +74,8 @@ table, td, div, span, p { padding: 0px; margin: 0px; }
 
 .Panel {
 	position: relative;
+	height:100%;
+	width:100%;
 }
 
 .Dialog {

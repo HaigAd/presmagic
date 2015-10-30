@@ -1,5 +1,7 @@
 define(['app/listable/listable'], function (Listable) {
 
+    	"use strict";
+    
 	var parentClass = app.Panel;
 	var parent = parentClass.prototype;
 	
@@ -19,7 +21,7 @@ define(['app/listable/listable'], function (Listable) {
 			Layout: 'Standard'
 		}, parentPanel);
 		options = options || [];
-		if(options['Filterable']) {
+		if(options.Filterable) {
 		    this.filterable = true;
 		}
 		
@@ -38,7 +40,7 @@ define(['app/listable/listable'], function (Listable) {
 	
 	ListPanel.prototype._prepare = function () {
 		parent._prepare.call(this);
-	}
+	};
 	
 	//Call this only if you want the default list behaviour, otherwise just call _prepare
 	ListPanel.prototype._defaultPrepare = function () {
@@ -47,7 +49,7 @@ define(['app/listable/listable'], function (Listable) {
 	    if(this.filterable) {
 		this._addFilterBox();
 	    }
-	}
+	};
 	
 	/**
 	 * Adds a default filter box to the list, which filters by the variable "Name"
@@ -56,7 +58,7 @@ define(['app/listable/listable'], function (Listable) {
 	ListPanel.prototype._addFilterBox = function(filterID) {
 	    this.getContainer().find('ul').before(SEARCH_BOX_HTML.replace("@ID", filterID));	
 	    this._setFilterBox("#" + filterID);
-	}
+	};
 	
 	/**
 	 * Sets the input box of the given jQuery selector as the box for filter operation
@@ -72,17 +74,17 @@ define(['app/listable/listable'], function (Listable) {
 		    $(this).css("background-color", "#FF7376");
 		}
 	    }).blur(function() {
-		if($(this).val().length == 0) {
+		if($(this).val().length === 0) {
 		    $(this).css("background-color", "#FFFFFF");
 		}
 	    });
 	    this._addFilter(this._defaultListFilter.bind(this));
-	}
+	};
 	
 	ListPanel.prototype._defaultListFilter = function(listable) {
-	    return (this._filterText.length == 0 
-		    || listable.Name.toLowerCase().indexOf(this._filterText) != -1);
-	}
+	    return (this._filterText.length === 0 ||
+		    listable.Name.toLowerCase().indexOf(this._filterText) != -1);
+	};
 	
 	/**
 	 * Adds the filter filterFn to this list's filters
@@ -90,7 +92,7 @@ define(['app/listable/listable'], function (Listable) {
 	 */
 	ListPanel.prototype._addFilter = function(filterFn) {
 	    this._filters.push(filterFn);
-	}
+	};
 	
 	/**
 	 * Removes the given function from the list of filters
@@ -105,20 +107,32 @@ define(['app/listable/listable'], function (Listable) {
 		    return;
 		}
 	    }
-	}
+	};
 
 	/**
 	 * Adds the given listable item to this list
 	 * If this list does not accept the item type, returns false
 	 * Will call listable.onAdd
 	 */
-	ListPanel.prototype._addItem = function(listable) {
+	ListPanel.prototype._addItem = function(listable, ignoreListUpdate) {
 	    if(this._accepts(listable)) {
 		this._list.push(listable);
-		this._updateList();
+		if(!ignoreListUpdate) {
+		    this._updateList();
+		}		
 		listable.onAdd(this);
 	    }
-	}
+	};
+
+	ListPanel.prototype._addItems = function(listableArray) {
+	    var i = 0,
+	        length = listableArray.length;
+	    
+	    for(i; i < length; i++) {
+		this._addItem(listableArray[i], true);
+	    }
+	    this._updateList();
+	};
 	
 	/**
 	 * Removes a listable by the given index from the list, if it is found. 
@@ -133,7 +147,7 @@ define(['app/listable/listable'], function (Listable) {
 	    this._updateList();
 	    listable.onRemove(this);
 	    return true;		
-	}
+	};
 	
 	
 	/**
@@ -144,13 +158,16 @@ define(['app/listable/listable'], function (Listable) {
 	 * Called by the ListPanel._addItemn function to check if an item can be added, before it actually is
 	 */
 	ListPanel.prototype._accepts = function(listable) {
-	    return true;
 	    if(listable instanceof Listable)
 		return true;
 	    return false;
-	}
+	};
 	
-	
+	/**
+	 * Updates the list when an item is added, changed or removed
+	 * This will work for vewry simple lists where there is only a Name listed
+	 * Any more complicated list will need to override this and implement its own _updateList method
+	 */
 	ListPanel.prototype._updateList = function () {
 		var $list = this.getContainer().find('ul');
 		$list[0].innerHTML = '';
@@ -167,16 +184,16 @@ define(['app/listable/listable'], function (Listable) {
 	
 	ListPanel.prototype._updateFilter = function(filterText) {
 		
-	    
-	    	var filterText = filterText.toLowerCase();
-	    	var i = 0, j = 0;
+	    	console.log('updating filter');
+	    	filterText = filterText.toLowerCase();
+	    	var j = 0;
 	    	var filteredOut = false;
 	    	
 		this._filterText = filterText;
 		
 		var rez = false; //return value, true only if there is at least one item left in the list
 		
-		for(i = 0; i < this._list.length; i++) {
+		for(let i = 0; i < this._list.length; i++) {
 		    filteredOut = false;
 		    for(j = 0; j < this._filters.length; j++) {	
 			

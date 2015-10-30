@@ -1,292 +1,300 @@
 define(['app/mixin/eventmanager'], function (appMixinEventManager) {
 
     var SplitView = function (parent, $container, value, valueType, dragable, primary, orientation) {
-		if (!arguments.length) {
-			return;
-		}
+	if (!arguments.length) {
+	    return;
+	}
 
-		this._parent = parent;
-        this._value = value;
-        this._valueType = valueType;
-		this._dragable = dragable;
-        this._primary = (
-			primary === SplitView.PRIMARY_TWO
-			? SplitView.PRIMARY_TWO
+	this._parent = parent;
+	this._value = value;
+	this._valueType = valueType;
+	this._dragable = dragable;
+	this._primary = (
+		primary === SplitView.PRIMARY_TWO
+		? SplitView.PRIMARY_TWO
 			: SplitView.PRIMARY_ONE
-		);
-		this._orientation = (
-			orientation === SplitView.ORIENTATION_HORIZONTAL
-			? SplitView.ORIENTATION_HORIZONTAL
+	);
+	this._orientation = (
+		orientation === SplitView.ORIENTATION_HORIZONTAL
+		? SplitView.ORIENTATION_HORIZONTAL
 			: SplitView.ORIENTATION_VERTICAL
-		);
+	);
 
-        this._result = null;
-		this._childOne = null;
-		this._childTwo = null;
+	this._result = null;
+	this._childOne = null;
+	this._childTwo = null;
 
-        this._$container = $container
-			.addClass('SplitViewContainer')
-			.addClass(this._orientation);
+	this._$container = $container
+	.addClass('SplitViewContainer')
+	.addClass(this._orientation);
 
-        this._$one = $('<div />').appendTo(this._$container);
-		this._$div = $('<div />').appendTo(this._$container);
-        this._$two = $('<div />').appendTo(this._$container);
+	this._$one = $('<div />').appendTo(this._$container);
+	this._$div = $('<div />').appendTo(this._$container);
+	this._$two = $('<div />').appendTo(this._$container);
 
-		this._setupDivider();
+	this._setupDivider();
 
-		appMixinEventManager.call(this);
+	appMixinEventManager.call(this);
 
-        this._parent.event.bind(app.EVENT_VIEW_RESIZE, this._resize.bind(this));
-        this.event.bind(app.EVENT_VIEW_RESIZE, this._resize.bind(this));
+	this._parent.event.bind(app.EVENT_VIEW_RESIZE, this._resize.bind(this));
+	this.event.bind(app.EVENT_VIEW_RESIZE, this._resize.bind(this));
     };
 
-	SplitView.PRIMARY_ONE = 'One';
-	SplitView.PRIMARY_TWO = 'Two';
-	SplitView.VALUE_TYPE_FIXED = 'Fixed';
-	SplitView.VALUE_TYPE_PERCENT = 'Percent';
-	SplitView.ORIENTATION_HORIZONTAL = 'Horizontal';
-	SplitView.ORIENTATION_VERTICAL = 'Vertical';
+    SplitView.PRIMARY_ONE = 'One';
+    SplitView.PRIMARY_TWO = 'Two';
+    SplitView.VALUE_TYPE_FIXED = 'Fixed';
+    SplitView.VALUE_TYPE_PERCENT = 'Percent';
+    SplitView.ORIENTATION_HORIZONTAL = 'Horizontal';
+    SplitView.ORIENTATION_VERTICAL = 'Vertical';
 
     SplitView.prototype.update = function () {
-		this._resize({
-			Width: this._$container[0].offsetWidth,
-			Height: this._$container[0].offsetHeight
-		});
-	};
-
-    SplitView.prototype.loadPanelOne = function (name) {
-		var self = this;
-        app.loadPanel(name, this._$one, this)
-			.then(function (panel) {
-				self._childOne = panel;
-				self.update();
-
-				panel.run();
-			}).done();
+	this._resize({
+	    Width: this._$container[0].offsetWidth,
+	    Height: this._$container[0].offsetHeight
+	});
     };
 
-    SplitView.prototype.loadPanelTwo = function (name) {
-		var self = this;
-        app.loadPanel(name, this._$two, this)
-			.then(function (panel) {
-				self._childTwo = panel;
-				self.update();
-
-				panel.run();
-			}).done();
+    SplitView.prototype.loadPanelOne = function (name, options) {
+	var self = this;
+	app.loadPanel(name, this._$one, this, options)
+	.then(function (panel) {
+	    self._childOne = panel;
+	    self.update();
+	    panel.run();
+	}).done();
     };
 
-	SplitView.prototype.splitHorizontalOne = function (value, valueType, dragable, primary) {
-        var splitView = new SplitView(this, this._$one, value, valueType, dragable, primary, SplitView.ORIENTATION_HORIZONTAL);
+    SplitView.prototype.loadPanelTwo = function (name, options) {
+	var self = this;
+	app.loadPanel(name, this._$two, this, options)
+	.then(function (panel) {
+	    self._childTwo = panel;
+	    self.update();
+	    panel.run();
+	}).done();
+    };
 
-		this._childOne = splitView;
-		this.update();
+    SplitView.prototype.getPanelOne = function() {
+	return this._childOne;
+    };
 
-		return splitView;
-	};
+    SplitView.prototype.getPanelTwo = function() {
+	return this._childTwo;
+    };    
 
-	SplitView.prototype.splitVerticalOne = function (value, valueType, dragable, primary) {
-        var splitView = new SplitView(this, this._$one, value, valueType, dragable, primary, SplitView.ORIENTATION_VERTICAL);
 
-		this._childOne = splitView;
-		this.update();
 
-		return splitView;
-	};
+    SplitView.prototype.splitHorizontalOne = function (value, valueType, dragable, primary) {
+	var splitView = new SplitView(this, this._$one, value, valueType, dragable, primary, SplitView.ORIENTATION_HORIZONTAL);
 
-	SplitView.prototype.splitHorizontalTwo = function (value, valueType, dragable, primary) {
-        var splitView = new SplitView(this, this._$two, value, valueType, dragable, primary, SplitView.ORIENTATION_HORIZONTAL);
+	this._childOne = splitView;
+	this.update();
 
-		this._childTwo = splitView;
-		this.update();
+	return splitView;
+    };
 
-		return splitView;
-	};
+    SplitView.prototype.splitVerticalOne = function (value, valueType, dragable, primary) {
+	var splitView = new SplitView(this, this._$one, value, valueType, dragable, primary, SplitView.ORIENTATION_VERTICAL);
 
-	SplitView.prototype.splitVerticalTwo = function (value, valueType, dragable, primary) {
-        var splitView = new SplitView(this, this._$two, value, valueType, dragable, primary, SplitView.ORIENTATION_VERTICAL);
+	this._childOne = splitView;
+	this.update();
 
-		this._childTwo = splitView;
-		this.update();
+	return splitView;
+    };
 
-		return splitView;
-	};
+    SplitView.prototype.splitHorizontalTwo = function (value, valueType, dragable, primary) {
+	var splitView = new SplitView(this, this._$two, value, valueType, dragable, primary, SplitView.ORIENTATION_HORIZONTAL);
+
+	this._childTwo = splitView;
+	this.update();
+
+	return splitView;
+    };
+
+    SplitView.prototype.splitVerticalTwo = function (value, valueType, dragable, primary) {
+	var splitView = new SplitView(this, this._$two, value, valueType, dragable, primary, SplitView.ORIENTATION_VERTICAL);
+
+	this._childTwo = splitView;
+	this.update();
+
+	return splitView;
+    };
 
     SplitView.prototype._resize = function (data) {
-		var result = this._calcResult(data.Width, data.Height);
+	var result = this._calcResult(data.Width, data.Height);
 
-		if (!this._resultChanged(result)) {
-			return;
-		}
+	if (!this._resultChanged(result)) {
+	    return;
+	}
 
-		this._$one[0].style.width = result.One.Width + 'px';
-		this._$one[0].style.height = result.One.Height + 'px';
-		this._$two[0].style.width = result.Two.Width + 'px';
-		this._$two[0].style.height = result.Two.Height + 'px';
+	this._$one[0].style.width = result.One.Width + 'px';
+	this._$one[0].style.height = result.One.Height + 'px';
+	this._$two[0].style.width = result.Two.Width + 'px';
+	this._$two[0].style.height = result.Two.Height + 'px';
 
-		if (this._childOne) {
-			this._childOne.event.trigger(app.EVENT_VIEW_RESIZE, {
-				Width: result.One.Width,
-				Height: result.One.Height
-			});
-		}
+	if (this._childOne) {
+	    this._childOne.event.trigger(app.EVENT_VIEW_RESIZE, {
+		Width: result.One.Width,
+		Height: result.One.Height
+	    });
+	}
 
-		if (this._childTwo) {
-			this._childTwo.event.trigger(app.EVENT_VIEW_RESIZE, {
-				Width: result.Two.Width,
-				Height: result.Two.Height
-			});
-		}
-	};
+	if (this._childTwo) {
+	    this._childTwo.event.trigger(app.EVENT_VIEW_RESIZE, {
+		Width: result.Two.Width,
+		Height: result.Two.Height
+	    });
+	}
+    };
 
     SplitView.prototype._calcResult = function (totalWidth, totalHeight) {
-        var result = this._result;
+	var result = this._result;
 
-        if (!result) {
-            result = {
-                One : {
-                    Width: totalWidth,
-                    Height: totalHeight
-                },
-                Two : {
-                    Width: totalWidth,
-                    Height: totalHeight
-                }
-            };
-        }
+	if (!result) {
+	    result = {
+		    One : {
+			Width: totalWidth,
+			Height: totalHeight
+		    },
+		    Two : {
+			Width: totalWidth,
+			Height: totalHeight
+		    }
+	    };
+	}
 
-		if (this._orientation === SplitView.ORIENTATION_HORIZONTAL) {
-			this._updateResultProperty(result, totalHeight, 'Height');
-		} else {
-			this._updateResultProperty(result, totalWidth, 'Width');
-		}
+	if (this._orientation === SplitView.ORIENTATION_HORIZONTAL) {
+	    this._updateResultProperty(result, totalHeight, 'Height');
+	} else {
+	    this._updateResultProperty(result, totalWidth, 'Width');
+	}
 
-        return result;
+	return result;
     };
 
     SplitView.prototype._updateResultProperty = function (result, totalValue, prop) {
-        if (this._valueType === SplitView.VALUE_TYPE_FIXED) {
-            if (this._primary === SplitView.PRIMARY_ONE) {
-                result.One[prop] = this._value - 2;
-                result.Two[prop] = totalValue - this._value - 2;
-            } else {
-                result.One[prop] = totalValue - this._value;
-                result.Two[prop] = this._value - 2;
-            }
-        } else {
-            if (this._primary === SplitView.PRIMARY_ONE) {
-				var fixedValue = Math.round(totalValue * this._value / 100);
-                result.One[prop] = fixedValue - 2;
-                result.Two[prop] = totalValue - fixedValue - 2;
-            } else {
-				var fixedValue = Math.round(totalValue * this._value / 100);
-                result.One[prop] = totalValue - fixedValue - 2;
-                result.Two[prop] = fixedValue - 2;
-            }
-        }
+	if (this._valueType === SplitView.VALUE_TYPE_FIXED) {
+	    if (this._primary === SplitView.PRIMARY_ONE) {
+		result.One[prop] = this._value - 2;
+		result.Two[prop] = totalValue - this._value - 2;
+	    } else {
+		result.One[prop] = totalValue - this._value;
+		result.Two[prop] = this._value - 2;
+	    }
+	} else {
+	    if (this._primary === SplitView.PRIMARY_ONE) {
+		var fixedValue = Math.round(totalValue * this._value / 100);
+		result.One[prop] = fixedValue - 2;
+		result.Two[prop] = totalValue - fixedValue - 2;
+	    } else {
+		var fixedValue = Math.round(totalValue * this._value / 100);
+		result.One[prop] = totalValue - fixedValue - 2;
+		result.Two[prop] = fixedValue - 2;
+	    }
+	}
     };
 
     SplitView.prototype._resultChanged = function (result) {
-        return (
-			!this._result
-            || result.One.Width !== this._result.One.Width
-            || result.One.Height !== this._result.One.Height
-            || result.Two.Width !== this._result.Two.Width
-            || result.Two.Height !== this._result.Two.Height
-        );
+	return (
+		!this._result
+		|| result.One.Width !== this._result.One.Width
+		|| result.One.Height !== this._result.One.Height
+		|| result.Two.Width !== this._result.Two.Width
+		|| result.Two.Height !== this._result.Two.Height
+	);
     };
 
-	SplitView.prototype._setupDivider = function () {
-		var $container = this._$container;
+    SplitView.prototype._setupDivider = function () {
+	var $container = this._$container;
 
-		this._$div
-			.addClass('Divider')
-			.addClass(this._orientation);
+	this._$div
+	.addClass('Divider')
+	.addClass(this._orientation);
 
-		if (!this._dragable) {
-			return;
-		}
+	if (!this._dragable) {
+	    return;
+	}
 
-		var eventName = 'mousemove.divider' + (Math.ceil(Math.random() * 8999) + 1000);
+	var eventName = 'mousemove.divider' + (Math.ceil(Math.random() * 8999) + 1000);
 
-		var dividerOnDrag = this._dividerOnDrag.bind(this);
-		this._$div
-			.addClass('Draggable')
-			.mousedown(function (mouseDownEvent) {
-				$container.addClass('Dragging');
+	var dividerOnDrag = this._dividerOnDrag.bind(this);
+	this._$div
+	.addClass('Draggable')
+	.mousedown(function (mouseDownEvent) {
+	    $container.addClass('Dragging');
 
-				var position = $container.position();
-				var container = {
-					top: position.top,
-					left: position.left,
-					width: $container[0].offsetWidth,
-					height: $container[0].offsetHeight
-				};
-				var offset = {
-					top: mouseDownEvent.offsetY,
-					left: mouseDownEvent.offsetX
-				};
+	    var position = $container.position();
+	    var container = {
+		    top: position.top,
+		    left: position.left,
+		    width: $container[0].offsetWidth,
+		    height: $container[0].offsetHeight
+	    };
+	    var offset = {
+		    top: mouseDownEvent.offsetY,
+		    left: mouseDownEvent.offsetX
+	    };
 
-				$container.bind(eventName, function (moveEvent) {
-					dividerOnDrag(container, offset, moveEvent);
-				});
-			});
+	    $container.bind(eventName, function (moveEvent) {
+		dividerOnDrag(container, offset, moveEvent);
+	    });
+	});
 
-		$container
-			.mouseup(function () {
-				$container.removeClass('Dragging');
-				$container.unbind(eventName);
-			});
-	};
+	$container
+	.mouseup(function () {
+	    $container.removeClass('Dragging');
+	    $container.unbind(eventName);
+	});
+    };
 
-	SplitView.prototype._dividerOnDrag = function (container, offset, event) {
-		if (this._orientation === SplitView.ORIENTATION_HORIZONTAL) {
-			this._value = this._getNewValue(container.height, event.pageY - container.top - offset.top);
-		} else {
-			this._value = this._getNewValue(container.width, event.pageX - container.left - offset.left);
-		}
+    SplitView.prototype._dividerOnDrag = function (container, offset, event) {
+	if (this._orientation === SplitView.ORIENTATION_HORIZONTAL) {
+	    this._value = this._getNewValue(container.height, event.pageY - container.top - offset.top);
+	} else {
+	    this._value = this._getNewValue(container.width, event.pageX - container.left - offset.left);
+	}
 
-		this._resize({
-			Width: container.width,
-			Height: container.height
-		});
-	};
+	this._resize({
+	    Width: container.width,
+	    Height: container.height
+	});
+    };
 
-	SplitView.prototype._getNewValue = function (totalValue, newValue) {
-		newValue += 2;
+    SplitView.prototype._getNewValue = function (totalValue, newValue) {
+	newValue += 2;
 
-		if (this._valueType === SplitView.VALUE_TYPE_FIXED) {
-			if (this._primary = SplitView.PRIMARY_ONE) {
-				return this._contain(newValue, totalValue);
-			} else {
-				return this._contain(totalValue - newValue, totalValue);
-			}
-		} else {
-			if (this._primary = SplitView.PRIMARY_ONE) {
-				return this._contain(Math.round(newValue / totalValue * 100), 100);
-			} else {
-				return this._contain(Math.round((totalValue - newValue) / totalValue * 100), 100);
-			}
-		}
-	};
+	if (this._valueType === SplitView.VALUE_TYPE_FIXED) {
+	    if (this._primary = SplitView.PRIMARY_ONE) {
+		return this._contain(newValue, totalValue);
+	    } else {
+		return this._contain(totalValue - newValue, totalValue);
+	    }
+	} else {
+	    if (this._primary = SplitView.PRIMARY_ONE) {
+		return this._contain(Math.round(newValue / totalValue * 100), 100);
+	    } else {
+		return this._contain(Math.round((totalValue - newValue) / totalValue * 100), 100);
+	    }
+	}
+    };
 
-	SplitView.prototype._contain = function (value, max) {
-		return Math.min(Math.max(value, 0), max);
-	};
+    SplitView.prototype._contain = function (value, max) {
+	return Math.min(Math.max(value, 0), max);
+    };
 
     var h = function (panel, value, valueType, dragable, primary) {
-        SplitView.prototype.constructor.call(this, panel, panel.getContainer(), value, valueType, dragable, primary, SplitView.ORIENTATION_HORIZONTAL);
+	SplitView.prototype.constructor.call(this, panel, panel.getContainer(), value, valueType, dragable, primary, SplitView.ORIENTATION_HORIZONTAL);
     };
-	h.prototype = new SplitView();
+    h.prototype = new SplitView();
 
     var v = function (panel, value, valueType, dragable, primary) {
-        SplitView.prototype.constructor.call(this, panel, panel.getContainer(), value, valueType, dragable, primary, SplitView.ORIENTATION_VERTICAL);
+	SplitView.prototype.constructor.call(this, panel, panel.getContainer(), value, valueType, dragable, primary, SplitView.ORIENTATION_VERTICAL);
     };
-	v.prototype = new SplitView();
+    v.prototype = new SplitView();
 
     return app.SplitView = {
-        Horizontal: h,
-        Vertical: v
+	    Horizontal: h,
+	    Vertical: v
     };
 
 });

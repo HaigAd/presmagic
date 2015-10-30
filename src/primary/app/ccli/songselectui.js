@@ -3,7 +3,7 @@ define(['text!app/ccli/CCLISearchTemplate.html',
         'app/ccli/LyricViewer',
         'style!app/ccli/CCLISearchPanelStyle.css'],
         
-        function (templateHTML) {
+        function (templateHTML, SongSelect) {
 
 	var parentClass = app.Panel;
 	var parent = parentClass.prototype;
@@ -130,7 +130,7 @@ define(['text!app/ccli/CCLISearchTemplate.html',
 		
 		app.promptPanel(this, opts).then(
 			function(result) {		
-				songSelectLogin(result['Username'], result['Password']).then(
+				SongSelect.login(result['Username'], result['Password']).then(
 					function() {
 					    self._errorState(SongSelectUI.LOGGED_IN);
 					}, 	
@@ -154,7 +154,7 @@ define(['text!app/ccli/CCLISearchTemplate.html',
 		
 		if (searchTerms.length > 0) {
 		    self._setLoadState(SongSelectUI.LOADING);
-		    songSelectSearch(searchTerms, 1/* page */).then(function(rez) {
+		    SongSelect.search(searchTerms, 1/* page */).then(function(rez) {
 			self._setLoadState(false);
 			self._populateList(rez);
 		    }, function(error) {

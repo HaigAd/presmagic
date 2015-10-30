@@ -80,7 +80,7 @@ define(function () {
 	
 	//returns a CCLISong object parsed from the given string
 	//TODO: Take this out of the global namespace
-	CCLISong.prototype.getCCLISong = function(filetext) {
+	CCLISong.getCCLISong = function(filetext) {
 		if(filetext === "") return false;
 		
 		var keyRegexp = /([A-Za-z]+)=(.*)/,
